@@ -1,9 +1,11 @@
 from collections import namedtuple
+
 import torch
 import torch.nn as nn
 import torch.nn.init as init
 from torchvision import models
 from torchvision.models.vgg import VGG16_BN_Weights
+
 
 def init_weights(modules):
     for m in modules:
@@ -17,6 +19,7 @@ def init_weights(modules):
         elif isinstance(m, nn.Linear):
             m.weight.data.normal_(0, 0.01)
             m.bias.data.zero_()
+
 
 class vgg16_bn(torch.nn.Module):
     def __init__(self, pretrained=True, freeze=True):
@@ -44,7 +47,7 @@ class vgg16_bn(torch.nn.Module):
         self.slice5 = torch.nn.Sequential(
             nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
             nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6),
-            nn.Conv2d(1024, 1024, kernel_size=1)
+            nn.Conv2d(1024, 1024, kernel_size=1),
         )
 
         if not pretrained:
@@ -70,6 +73,6 @@ class vgg16_bn(torch.nn.Module):
         h_relu5_3 = h
         h = self.slice5(h)
         h_fc7 = h
-        vgg_outputs = namedtuple("VggOutputs", ['fc7', 'relu5_3', 'relu4_3', 'relu3_2', 'relu2_2'])
+        vgg_outputs = namedtuple("VggOutputs", ["fc7", "relu5_3", "relu4_3", "relu3_2", "relu2_2"])
         out = vgg_outputs(h_fc7, h_relu5_3, h_relu4_3, h_relu3_2, h_relu2_2)
         return out
